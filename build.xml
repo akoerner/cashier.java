@@ -1,0 +1,50 @@
+<project name="Cashier" default="dist" basedir=".">
+  
+  <property name="test.dir" location="test"/>
+  <property name="lib.dir" location="lib"/>
+  <property name="src.dir" location="src"/>
+  <property name="build.dir" location="build"/>
+  <property name="dist.dir"  location="dist"/>
+  
+  <path id="test">
+    <pathelement location="${build.dir}/tests" />
+    <pathelement location="${build.dir}/classes" />
+    <fileset dir="${lib.dir}">
+      <include name="**/*.jar"/>
+    </fileset>
+  </path>
+      
+  <target name="clean">
+    <delete dir="${build.dir}"/>
+    <delete dir="${dist.dir}"/>
+  </target>
+
+  <target name="compile" depends="clean">
+    <mkdir dir="${build.dir}/classes"/>
+    <javac srcdir="${src.dir}" destdir="${build.dir}/classes" includeantruntime="false"/>
+  </target>
+  
+  <target name="compile-tests" depends="compile">
+    <mkdir dir="${build.dir}/tests"/>
+    <javac srcdir="${test.dir}" destdir="${build.dir}/tests" classpathref="test" includeantruntime="false"/>
+  </target>
+
+  <target name="dist" depends="compile">
+    <mkdir dir="${dist.dir}"/>
+    <jar jarfile="${dist.dir}/cashier.jar"/>
+  </target>
+  
+  <target name="junit" depends="compile-tests">
+    <junit printsummary="yes" showoutput="true" fork="yes" haltonfailure="yes">
+      <formatter usefile="false" type="brief"/>
+      
+      <classpath refid="test"/>
+      
+      <batchtest fork="yes">
+        <fileset dir="${build.dir}/tests">
+          <include name="**/*Test.class" />
+        </fileset>
+      </batchtest>
+    </junit>
+  </target>
+</project>
