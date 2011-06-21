@@ -80,7 +80,7 @@ public class Entry extends Resource {
 	}
 
 	public static ArrayList<Resource> query(Query query) throws ConnectionDisabledException {
-		return Resource.query(query , Entry.RESOURCE, Entry.TABLE);
+		return Resource.query(query, Entry.RESOURCE, Entry.TABLE);
 	}
 
     ///////////////////////

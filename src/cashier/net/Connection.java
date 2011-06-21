@@ -26,7 +26,7 @@ import cashier.exceptions.request.InvalidRequestException;
  * api key and secret can be verified by calling the connected method.
  * </p>
  *
- * @author Andrew Koerner
+ * @author <a href="mailto:andrewkoerner.b@gmail.com"> Andrew Koerner</a>
  * @version 1.0
  * 
  */
@@ -181,8 +181,6 @@ public class Connection {
 	 * Postcondition: The connection is disabled and
 	 * subsequent calls to Connection.connect() or Connection.submitRequest() will throw exceptions.
 	 * </p>
-	 * @return Boolean if the API key and Secret are valid for the provided
-	 *         server then true is returned else false is returned
 	 * @throws ConnectionDisabled
 	 *             The connection must be enabled by calling
 	 *             Connection.setConnectionConstants.

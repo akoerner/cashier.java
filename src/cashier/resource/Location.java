@@ -69,7 +69,7 @@ public class Location extends Resource {
 	}
 
 	public static ArrayList<Resource> query(Query query) throws ConnectionDisabledException {
-		return Resource.query(query , Location.RESOURCE, Location.TABLE);
+		return Resource.query(query, Location.RESOURCE, Location.TABLE);
 	}
     ///////////////////////
 	//Getters and Setters//

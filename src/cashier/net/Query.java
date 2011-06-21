@@ -35,7 +35,7 @@ package cashier.net;
  * 
  * 
  * </code>
- * @author Andrew Koerner
+ * @author <a href="mailto:andrewkoerner.b@gmail.com"> Andrew Koerner</a>
  * @version 1.0
  * 
  */

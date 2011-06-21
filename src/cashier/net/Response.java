@@ -5,7 +5,7 @@ package cashier.net;
 * Cashier Response objects are formulated when an HTTP Casher Request is submitted.  The response will contain the message data from the server and the
 * HyperText Transfer Protocol (HTTP/1.1) response status code. This class works side by side with the Cashier Connection class, Request class and Resource class.
 * 
-* @author Andrew Koerner
+* @author <a href="mailto:andrewkoerner.b@gmail.com"> Andrew Koerner</a>
 * @version 1.0
 * 
 */

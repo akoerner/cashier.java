@@ -111,7 +111,7 @@ public class Line extends Resource {
 	}
 
 	public static ArrayList<Resource> query(Query query) throws ConnectionDisabledException {
-		return Resource.query(query , Line.RESOURCE, Line.TABLE);
+		return Resource.query(query, Line.RESOURCE, Line.TABLE);
 	}
     ///////////////////////
 	//Getters and Setters//

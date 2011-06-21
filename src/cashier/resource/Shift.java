@@ -72,7 +72,7 @@ public class Shift extends Resource {
 	}
 
 	public static ArrayList<Resource> query(Query query) throws ConnectionDisabledException {
-		return Resource.query(query , Shift.RESOURCE, Shift.TABLE);
+		return Resource.query(query, Shift.RESOURCE, Shift.TABLE);
 	}
     ///////////////////////
 	//Getters and Setters//

@@ -90,7 +90,7 @@ public class Invoice extends Resource {
 	}
 
 	public static ArrayList<Resource> query(Query query) throws ConnectionDisabledException {
-		return Resource.query(query , Invoice.RESOURCE, Invoice.TABLE);
+		return Resource.query(query, Invoice.RESOURCE, Invoice.TABLE);
 	}
 
     ///////////////////////

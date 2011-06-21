@@ -73,7 +73,7 @@ public class Store extends Resource {
 	}
 
 	public static ArrayList<Resource> query(Query query) throws ConnectionDisabledException {
-		return Resource.query(query , Store.RESOURCE, Store.TABLE);
+		return Resource.query(query, Store.RESOURCE, Store.TABLE);
 	}
     ///////////////////////
 	//Getters and Setters//
