@@ -291,7 +291,7 @@ public class Connection {
 				sb.append(line);
 			}
 			rd.close();
-
+			System.out.println(Connection.connection.getHeaderField("Date"));
 			Connection.connection.disconnect();
 			response.setBody(sb.toString());
 			return response;
@@ -395,6 +395,19 @@ public class Connection {
 		return response;
 	}
 	
+	public static boolean serverClientTimeSynchronizeCheck(){
+		if(Connection.enabled){
+			try {
+				Connection.connected();
+			} catch (ConnectionDisabledException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+		}
+		return true;
+	}
 	
     ///////////////////////
 	//Getters and Setters//
