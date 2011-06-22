@@ -33,10 +33,9 @@ public class TimeTools {
         return dateTime.toString();
 	}
 	
-	public static Long httpDateTimestampToUnixTimestamp(String gmt){
+	public static Long httpDateTimestampToUnixTimestamp(String timestamp){
 		DateTimeFormatter df = DateTimeFormat.forPattern("EEE, dd MMM yyyy HH:mm:ss 'GMT'");
-		DateTime dateTime = df.withOffsetParsed().parseDateTime("Wed, 22 Jun 2011 22:43:13 GMT");
-		return dateTime.getMillis();
+		return df.withOffsetParsed().parseDateTime(timestamp).getMillis();
 	}
 	
 }
