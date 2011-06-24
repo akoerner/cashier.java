@@ -21,7 +21,7 @@ public class Response {
 	private String statusCode;
 	
 	/* -- Constructors -- */
-	 
+
 	/**
 	  * default, Creates a new <code>Response</code> instance.
 	  **/

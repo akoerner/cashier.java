@@ -12,9 +12,14 @@ import java.net.HttpURLConnection;
 import java.net.ProtocolException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Period;
+
 import cashier.exceptions.connection.ConnectionDisabledException;
 import cashier.exceptions.connection.NullConnectionConstantProvidedException;
 import cashier.exceptions.request.InvalidRequestException;
+import cashier.tools.TimeTools;
 
 /**
  * <p>
@@ -291,7 +296,6 @@ public class Connection {
 				sb.append(line);
 			}
 			rd.close();
-			System.out.println(Connection.connection.getHeaderField("Date"));
 			Connection.connection.disconnect();
 			response.setBody(sb.toString());
 			return response;
@@ -399,6 +403,19 @@ public class Connection {
 		if(Connection.enabled){
 			try {
 				Connection.connected();
+				Long serverTime = TimeTools.httpDateTimestampToUnixTimestamp(Connection.connection.getHeaderField("Date"));
+				Long systemTime = DateTimeZone.getDefault().convertLocalToUTC(new DateTime(System.currentTimeMillis()).getMillis(), false);
+				System.out.println(new DateTime(serverTime));
+				System.out.println(new DateTime(systemTime));
+				System.out.println(serverTime);
+				System.out.println(systemTime);
+				Period period = new Period(new DateTime(systemTime), new DateTime(serverTime));
+				if(period.getMinutes() > 5){
+					return true;
+				}else{
+					return false;
+				}
+				
 			} catch (ConnectionDisabledException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
