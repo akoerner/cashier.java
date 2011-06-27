@@ -405,10 +405,6 @@ public class Connection {
 				Connection.connected();
 				Long serverTime = TimeTools.httpDateTimestampToUnixTimestamp(Connection.connection.getHeaderField("Date"));
 				Long systemTime = DateTimeZone.getDefault().convertLocalToUTC(new DateTime(System.currentTimeMillis()).getMillis(), false);
-				System.out.println(new DateTime(serverTime));
-				System.out.println(new DateTime(systemTime));
-				System.out.println(serverTime);
-				System.out.println(systemTime);
 				Period period = new Period(new DateTime(systemTime), new DateTime(serverTime));
 				if(period.getMinutes() > 5){
 					return true;
