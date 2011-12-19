@@ -6,7 +6,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URL;
-import sun.misc.BASE64Encoder;
+//import sun.misc.BASE64Encoder;
+import org.apache.commons.codec.binary.Base64;
 //exception imports
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
@@ -103,13 +104,8 @@ public class Connection {
 			throws NullConnectionConstantProvidedException {
 		if (rootUrl != null && apiKey != null && apiSecret != null
 				&& token != null) {
-			if (rootUrl.charAt(rootUrl.length() - 1) != "/".charAt(0)){
-				rootUrl += "/";
-			}
-
-			if (rootUrl.toLowerCase().indexOf("http://") == -1) {
-				rootUrl = "http://" + rootUrl;
-			}
+			if (rootUrl.charAt(rootUrl.length() - 1) != "/".charAt(0))rootUrl += "/";
+			if (rootUrl.toLowerCase().indexOf("http://") == -1)rootUrl = "http://" + rootUrl;
 			Connection.rootUrl = rootUrl;
 			Connection.apiKey = apiKey;
 			Connection.apiSecret = apiSecret;
@@ -244,18 +240,18 @@ public class Connection {
 	 * <p>
 	 * Precondition: The connection must first be enabled by providing not null
 	 * connection constants.<br /> 
-	 * Postcondition: A HttpURLConnection is initialized.
+	 * Postcondition: A HttpURLConnecti5on is initialized.
 	 * </p>
 	 * 
 	 * @param request Cashier Request object to submit
 	 */
 	protected static void initialize(Request request) {
 		try {
-			BASE64Encoder enc = new sun.misc.BASE64Encoder();
+			String connectionString = Base64encode(((String)(Connection.apiKey + ":" + Connection.apiSecret)).replace("\n",""));
 			Connection.resourceUrl = new URL(Connection.rootUrl + "~"
 					+ Connection.token + "/" + request.getResourceAddress());
-			Connection.connection = (HttpURLConnection) Connection.resourceUrl
-					.openConnection();
+			System.out.println(Connection.resourceUrl.toString());
+			Connection.connection = (HttpURLConnection) Connection.resourceUrl.openConnection();
 			Connection.connection.setRequestProperty("Accept",
 					"application/json");
 			Connection.connection.setRequestProperty("Content-Type",
@@ -266,15 +262,13 @@ public class Connection {
 					.setRequestProperty(
 							"Authorization",
 							"Basic "
-									+ enc.encode(
-											(Connection.apiKey + ":" + Connection.apiSecret)
-													.getBytes()).replace("\n",
-											""));
+									+ connectionString);
 			Connection.connection.setDoInput(true);
 			Connection.connection.setDoOutput(true);
 		} catch (java.net.MalformedURLException mue) {
 			System.out.println("Malformed URL");
 		} catch (java.io.IOException ioe) {
+			
 			System.out.println();
 			System.out.println("Error Message:");
 			System.out.println(ioe.getMessage().split("for")[0]);
@@ -420,6 +414,10 @@ public class Connection {
 			
 		}
 		return true;
+	}
+	
+	public static String Base64encode(String text){
+		 return Base64.encodeBase64String(text.getBytes()).toString();
 	}
 	
     ///////////////////////
