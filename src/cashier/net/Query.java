@@ -24,7 +24,7 @@ package cashier.net;
  * <code>
  * <br />
  *   ArrayList<Customer> customers;<br />
- *   Query query = new Query(Integer.toString(5), Integer.toString(5), Customer.NOTES+"= ? AND "+Customer.CREDIT+" = ?");<br />
+ *   Query query = new Query(5, 5, Customer.NOTES+"= ? AND "+Customer.CREDIT+" = ?");<br />
  *   query.addPreparedValue("Hello, World!");<br />
  *   query.addPreparedValue("3000");<br />
  *  try {<br />
@@ -79,9 +79,9 @@ public class Query {
 	  * @param offset The offest in witch to start returning Cashier resource objects in reference to the resource id. 
 	  * @param sqlPreparedStatement the sql prepared statement to submit in the query.
 	  **/
-	public Query(String limit, String offset,String sqlPreparedStatement){
-		this.limit = limit;
-		this.offset = offset;
+	public Query(int limit, int offset, String sqlPreparedStatement){
+		this.limit = Integer.toString(limit);
+		this.offset = Integer.toString(offset);
 		this.sqlPreparedStatement = sqlPreparedStatement;
 	}
 	

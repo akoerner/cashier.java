@@ -106,7 +106,7 @@ public class Line extends Resource {
 		return Resource.all(limit, offset, Line.RESOURCE, Line.TABLE);
 	}
 
-	public static Response destroy(Integer id) throws ConnectionDisabledException {
+	public static Response destroy(int id) throws ConnectionDisabledException {
 		return Resource.destroy(id, Line.RESOURCE, Line.TABLE);
 	}
 

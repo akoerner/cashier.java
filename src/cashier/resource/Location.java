@@ -64,7 +64,7 @@ public class Location extends Resource {
 		return Resource.all(limit, offset, Location.RESOURCE, Location.TABLE);
 	}
 
-	public static Response destroy(Integer id) throws ConnectionDisabledException {
+	public static Response destroy(int id) throws ConnectionDisabledException {
 		return Resource.destroy(id, Location.RESOURCE, Location.TABLE);
 	}
 

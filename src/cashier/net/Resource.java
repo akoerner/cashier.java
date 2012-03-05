@@ -101,7 +101,7 @@ public abstract class Resource{
 	 */
 	public static ArrayList<Resource> find(int id, String resource, String table) throws ConnectionDisabledException {
 		Request request = new Request(resource, table);
-		try {
+		try{
 			request.setMethod(Request.GET);
 			request.setResourceAddress(request.getTable()+"/"+id);
 			ArrayList<Resource> tempResource = Resource.fromJSON(request.submit().getBody());
@@ -220,11 +220,9 @@ public abstract class Resource{
 			stringBuilder.append(", \""+query.getNextPreparedValue().getValue()+"\"");
 		}
 		stringBuilder.append("],\"limit\":"+query.getLimit()+", \"offset\":"+query.getOffset()+"}}");
-		System.out.println(stringBuilder.toString());
 		
 		
 		try {
-			System.out.println(query);
 			request.setBody(stringBuilder.toString());
 			request.setMethod(Request.POST);
 			request.setResourceAddress(request.getTable()+"/query");
@@ -290,7 +288,6 @@ public abstract class Resource{
 	 *
 	 */
 	public static ArrayList<Resource> fromJSON(String json){
-		
 		if(json == null || json.equals("")){
 			return new ArrayList<Resource>();
 		}
@@ -368,7 +365,6 @@ public abstract class Resource{
 		
 		String res = ((Resource)resource).getResource();
 		
-		
 		if(res.contains(Customer.RESOURCE)){
 			return gsonBuilder.excludeFieldsWithoutExposeAnnotation().create().toJson((Customer)resource);
 		}else if(res.contains(Entry.RESOURCE)){
@@ -432,7 +428,6 @@ public abstract class Resource{
 	 */
 	public static int getLastInsertId(){
 		
-		System.out.println(Connection.lastResponse.getStatusCode());
 		if(Connection.lastResponse.getStatusCode().equals("201")){
 			String json = Connection.lastResponse.getBody();
 			Resource resource = Resource.fromJSON(json).get(0);

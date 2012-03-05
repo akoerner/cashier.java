@@ -88,7 +88,7 @@ public class Transaction extends Resource {
 		return Resource.all(limit, offset, Transaction.RESOURCE, Transaction.TABLE);
 	}
 
-	public static Response destroy(Integer id) throws ConnectionDisabledException {
+	public static Response destroy(int id) throws ConnectionDisabledException {
 		return Resource.destroy(id, Transaction.RESOURCE, Transaction.TABLE);
 	}
 

@@ -2,9 +2,15 @@ package cashier.resource;
 
 import java.net.ProtocolException;
 import java.util.ArrayList;
+
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
+
 import cashier.exceptions.connection.ConnectionDisabledException;
 import cashier.exceptions.request.InvalidRequestException;
 import cashier.net.*;
+import cashier.tools.DataSlammer;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -32,6 +38,16 @@ public class User extends Resource {
 	@Expose(serialize = false, deserialize = false) public static final String PASSWORD_SALT = "password_salt";
 	@Expose(serialize = false, deserialize = false) public static final String ADMINISTRATOR = "administrator";
 	@Expose(serialize = false, deserialize = false) public static final String ACTIVE = "active";
+	
+	//lazyloading
+	@Expose(serialize = false, deserialize = false) public Person person;
+	@Expose(serialize = false, deserialize = false) public int personDataSlammerIndex = -1;
+	
+	@Expose(serialize = false, deserialize = false) private ArrayList<Resource> timecards;
+	@Expose(serialize = false, deserialize = false) private int timecardsDataSlammerIndex = -1;
+	
+	@Expose(serialize = false, deserialize = false) private double timecardSum;
+	@Expose(serialize = false, deserialize = false) private DataSlammer dataSlammer;
 
 	private class Data{
 		@Expose(serialize = true, deserialize = true) 
@@ -117,12 +133,60 @@ public class User extends Resource {
 		return Resource.all(limit, offset, User.RESOURCE, User.TABLE);
 	}
 
-	public static Response destroy(Integer id) throws ConnectionDisabledException {
+	public static Response destroy(int id) throws ConnectionDisabledException {
 		return Resource.destroy(id, User.RESOURCE, User.TABLE);
 	}
 
 	public static ArrayList<Resource> query(Query query) throws ConnectionDisabledException {
 		return Resource.query(query, User.RESOURCE, User.TABLE);
+	}
+	
+	///////////////////////
+	//Busy Logic Methods //
+	///////////////////////
+	
+	public void fetchUsersTimecardsByDateRange(DateTime begin, DateTime end){
+		
+		if(this.data.id == 0)return;
+		if(this.dataSlammer == null)this.dataSlammer = new DataSlammer();
+
+		
+		Query query = new Query(100000, 0, Timecard.USER_ID+"= ? AND " + Timecard.BEGIN+" >= ?AND "+Timecard.END+" <= ?");	
+		query.addPreparedValue(Integer.toString(this.data.id));
+		query.addPreparedValue(begin.toString());
+		query.addPreparedValue(end.toString());
+		
+		this.timecardsDataSlammerIndex = this.dataSlammer.addResourceLoader(DataSlammer.TIMECARD, DataSlammer.QUERY, null, null, query);
+	}
+	
+	public void fetchPerson(){
+		if(this.dataSlammer == null){
+			this.dataSlammer = new DataSlammer();
+		}
+		this.personDataSlammerIndex = this.dataSlammer.addResourceLoader(DataSlammer.PERSON, DataSlammer.FIND, Integer.toString(this.data.id), null, null);
+	}
+	
+	private double sumTimecardHours(){
+		this.getTimecards();
+		if(this.timecards != null){
+			Timecard tempTimecard;
+			Interval tempInterval;
+			long sum = 0;
+			for(int timecardNumber = 0; timecardNumber<this.timecards.size(); timecardNumber++){
+				tempTimecard = (Timecard)this.timecards.get(timecardNumber);
+				tempInterval = new Interval(new DateTime(tempTimecard.getBegin()), new DateTime(tempTimecard.getEnd()));
+				System.out.println(tempTimecard.getBegin());
+				System.out.println(tempTimecard.getEnd());
+				sum+=tempInterval.toDurationMillis();
+			}
+			return (sum*1.0)/(1000 * 60 * 60 * 1.0);
+		}else{
+			return 0.0;
+		}
+	}
+	
+	public boolean lazyLoadComplete(){
+		return this.dataSlammer.areAllResultsReady();
 	}
 	
     ///////////////////////
@@ -186,6 +250,34 @@ public class User extends Resource {
 
 	public void setActive(boolean active) {
 		this.data.active = active;
+	}
+
+	public Person getPerson() {
+		return person;
+	}
+
+	public void setPerson(Person person) {
+		if(this.personDataSlammerIndex !=-1 && this.lazyLoadComplete())
+			this.person = (Person)this.dataSlammer.getResultAtIndex(personDataSlammerIndex).get(0);
+		this.person = person;
+	}
+
+	public ArrayList<Resource> getTimecards() {
+		if(this.timecardsDataSlammerIndex != -1 && this.lazyLoadComplete())
+			this.timecards = this.dataSlammer.getResultAtIndex(this.timecardsDataSlammerIndex);
+		return timecards;
+	}
+
+	public void setTimecards(ArrayList<Resource> timecards) {
+		this.timecards = timecards;
+	}
+
+	public double getTimecardSum() {
+		return this.sumTimecardHours();
+	}
+
+	public void setTimecardSum(double timecardSum) {
+		this.timecardSum = timecardSum;
 	}
 
 }

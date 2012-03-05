@@ -60,6 +60,7 @@ public class Request{
 	public Request(String resource, String table){
 		this.resource = resource;
 		this.table = table;
+		this.resourceAddress = this.table;
 		
 	}
 	

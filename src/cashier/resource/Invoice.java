@@ -85,7 +85,7 @@ public class Invoice extends Resource {
 		return Resource.all(limit, offset, Invoice.RESOURCE, Invoice.TABLE);
 	}
 
-	public static Response destroy(Integer id) throws ConnectionDisabledException {
+	public static Response destroy(int id) throws ConnectionDisabledException {
 		return Resource.destroy(id, Invoice.RESOURCE, Invoice.TABLE);
 	}
 

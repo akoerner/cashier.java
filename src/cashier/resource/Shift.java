@@ -67,7 +67,7 @@ public class Shift extends Resource {
 		return Resource.all(limit, offset, Shift.RESOURCE, Shift.TABLE);
 	}
 
-	public static Response destroy(Integer id) throws ConnectionDisabledException {
+	public static Response destroy(int id) throws ConnectionDisabledException {
 		return Resource.destroy(id, Shift.RESOURCE, Shift.TABLE);
 	}
 

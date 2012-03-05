@@ -82,7 +82,7 @@ public class Customer extends Resource{
 		return Resource.all(limit, offset, Customer.RESOURCE, Customer.TABLE);
 	}
 
-	public static Response destroy(Integer id) throws ConnectionDisabledException {
+	public static Response destroy(int id) throws ConnectionDisabledException {
 		return Resource.destroy(id, Customer.RESOURCE, Customer.TABLE);
 	}
 	
@@ -93,7 +93,7 @@ public class Customer extends Resource{
     ///////////////////////
 	//Getters and Setters//
 	///////////////////////
-	public int getId() {
+	public int getId(){
 		return this.data.id;
 	}
 

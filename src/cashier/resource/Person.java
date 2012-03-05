@@ -24,7 +24,7 @@ public class Person extends Resource {
 	@Expose(serialize = true, deserialize = true) private Data data;
 	
 	/*-Resource Constants-*/
-	@Expose(serialize = false, deserialize = false) public static final String ID = "";
+	@Expose(serialize = false, deserialize = false) public static final String ID = "id";
 	@Expose(serialize = false, deserialize = false) public static final String FIRST_NAME = "first_name";
 	@Expose(serialize = false, deserialize = false) public static final String MIDDLE_NAME = "middle_name";
 	@Expose(serialize = false, deserialize = false) public static final String LAST_NAME = "last_name";
@@ -85,7 +85,7 @@ public class Person extends Resource {
 		return Resource.all(limit, offset, Person.RESOURCE, Person.TABLE);
 	}
 
-	public static Response destroy(Integer id) throws ConnectionDisabledException {
+	public static Response destroy(int id) throws ConnectionDisabledException {
 		return Resource.destroy(id, Person.RESOURCE, Person.TABLE);
 	}
 

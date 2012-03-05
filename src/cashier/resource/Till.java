@@ -63,7 +63,7 @@ public class Till extends Resource {
 		return Resource.all(limit, offset, Till.RESOURCE, Till.TABLE);
 	}
 
-	public static Response destroy(Integer id) throws ConnectionDisabledException {
+	public static Response destroy(int id) throws ConnectionDisabledException {
 		return Resource.destroy(id, Till.RESOURCE, Till.TABLE);
 	}
 

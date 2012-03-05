@@ -75,7 +75,7 @@ public class Entry extends Resource {
 		return Resource.all(limit, offset, Entry.RESOURCE, Entry.TABLE);
 	}
 
-	public static Response destroy(Integer id) throws ConnectionDisabledException {
+	public static Response destroy(int id) throws ConnectionDisabledException {
 		return Resource.destroy(id, Entry.RESOURCE, Entry.TABLE);
 	}
 

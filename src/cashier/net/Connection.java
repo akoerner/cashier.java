@@ -7,7 +7,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.URL;
 //import sun.misc.BASE64Encoder;
-import org.apache.commons.codec.binary.Base64;
+//import org.apache.commons.codec.binary.Base64;
 //exception imports
 import java.net.HttpURLConnection;
 import java.net.ProtocolException;
@@ -66,6 +66,8 @@ public class Connection {
 	 * current state of the connection if it is disabled and calls to the Cashier Conneciton will cause Exceptions to be thrown
 	 */
 	protected static boolean enabled = false;
+	
+	private static boolean locked = false;
 	/**
 	 * The most recent Cashier Request object submitted to the Cashier Connection.
 	 */
@@ -73,7 +75,7 @@ public class Connection {
 	/**
 	 * The most recent Cashier Response object received from the cashier server.
 	 */
-	public static Response lastResponse;
+	public static Response lastResponse;;
 
 	protected Connection() {}
 
@@ -113,8 +115,7 @@ public class Connection {
 			Connection.enabled = true;
 		} else {
 			Connection.enabled = false;
-			throw new NullConnectionConstantProvidedException(rootUrl, apiKey,
-					apiSecret, token);
+			throw new NullConnectionConstantProvidedException(rootUrl, apiKey, apiSecret, token);
 		}
 	}
 	
@@ -133,29 +134,38 @@ public class Connection {
 	 *             The connection must be enabled by calling
 	 *             Connection.setConnectionConstants.
 	 */
-	public static Response submitRequest(Request request) throws ConnectionDisabledException {
+	public static synchronized Response submitRequest(Request request) throws ConnectionDisabledException {
 		Response response = null;
-		Connection.lastRequest = request;
-		if (Connection.isEnabled()) {
-			if (request.getMethod().equals(Request.POST) || request.getMethod().equals(Request.PUT)) {
-				response = Connection.putPost(request);
-			} else if (request.getMethod().equals(Request.GET)) {
-				response = Connection.get(request);
-			} else if (request.getMethod().equals(Request.DELETE)) {
-				response = Connection.delete(request);
+		if(!Connection.locked){
+			Connection.locked = true;
+			Connection.lastRequest = request;
+			if(Connection.isEnabled()){
+				if(request.getMethod().equals(Request.POST) || request.getMethod().equals(Request.PUT)){
+					response = Connection.putPost(request);
+				}else if (request.getMethod().equals(Request.GET)){
+					response = Connection.get(request);
+				}else if (request.getMethod().equals(Request.DELETE)){
+					response = Connection.delete(request);
+				}
+				
+			} else {
+				throw new ConnectionDisabledException("");
 			}
-			
-		} else {
-			throw new ConnectionDisabledException("");
+			if(response != null){
+				Connection.lastResponse = response;
+				Connection.locked = false;
+				return response;
+			}else{
+				response = new Response();
+				Connection.lastResponse = response;
+				Connection.locked = false;
+				return response;
+			}
 		}
-		if(response != null){
-			Connection.lastResponse = response;
-			return response;
-		}else{
-			response = new Response();
-			Connection.lastResponse = response;
-			return response;
-		}
+		
+		response = new Response();
+		Connection.lastResponse = response;
+		return response;
 
 	}
 
@@ -170,7 +180,7 @@ public class Connection {
 	 *         returned else false.
 	 */
 	public static boolean isEnabled() {
-		return enabled;
+		return Connection.enabled;
 	}
 
 	/**
@@ -188,6 +198,10 @@ public class Connection {
 	 */
 	public static void disable() {
 		Connection.enabled = false;
+	}
+	
+	public static boolean isLocked(){
+		return Connection.locked;
 	}
 
 	/**
@@ -222,6 +236,7 @@ public class Connection {
 			try {
 				response = request.submit();
 				if (response.getStatusCode().equals("200")) {
+					Connection.enabled = true;
 					return true;
 				}
 			} catch (InvalidRequestException e) {
@@ -243,26 +258,18 @@ public class Connection {
 	 * Postcondition: A HttpURLConnecti5on is initialized.
 	 * </p>
 	 * 
-	 * @param request Cashier Request object to submit
+	 * @param Cashier Request object to submit
 	 */
-	protected static void initialize(Request request) {
+	protected static void submit(Request request) {
 		try {
 			String connectionString = Base64encode(((String)(Connection.apiKey + ":" + Connection.apiSecret)).replace("\n",""));
-			Connection.resourceUrl = new URL(Connection.rootUrl + "~"
-					+ Connection.token + "/" + request.getResourceAddress());
-			System.out.println(Connection.resourceUrl.toString());
+			Connection.resourceUrl = new URL(Connection.rootUrl + "~" + Connection.token + "/" + request.getResourceAddress());
 			Connection.connection = (HttpURLConnection) Connection.resourceUrl.openConnection();
-			Connection.connection.setRequestProperty("Accept",
-					"application/json");
-			Connection.connection.setRequestProperty("Content-Type",
-					"application/json");
+			Connection.connection.setRequestProperty("Accept", "application/json");
+			Connection.connection.setRequestProperty("Content-Type", "application/json");
 			Connection.connection.setRequestProperty("charset", "utf-8");
 			Connection.connection.setRequestMethod(request.getMethod());
-			Connection.connection
-					.setRequestProperty(
-							"Authorization",
-							"Basic "
-									+ connectionString);
+			Connection.connection.setRequestProperty("Authorization","Basic "+ connectionString);
 			Connection.connection.setDoInput(true);
 			Connection.connection.setDoOutput(true);
 		} catch (java.net.MalformedURLException mue) {
@@ -280,8 +287,9 @@ public class Connection {
 	private static Response get(Request request) {
 	
 		Response response = new Response();
-		Connection.initialize(request);
-		try {
+		Connection.submit(request);
+		
+		try{
 			response.setStatusCode(Integer.toString(Connection.connection.getResponseCode()));
 			BufferedReader rd = new BufferedReader(new InputStreamReader(Connection.connection.getInputStream()));
 			StringBuilder sb = new StringBuilder();
@@ -293,28 +301,30 @@ public class Connection {
 			Connection.connection.disconnect();
 			response.setBody(sb.toString());
 			return response;
-		} catch (UnsupportedEncodingException e) {
+		}catch (UnsupportedEncodingException e){
 			try {
 				response.setStatusCode(Integer.toString(Connection.connection.getResponseCode()));
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
 			
-		} catch (IOException e) {
+		}catch(IOException e) {
 			try {
 				response.setStatusCode(Integer.toString(Connection.connection.getResponseCode()));
-			} catch (IOException e1) {
-				e1.printStackTrace();
+			}catch(IOException e1){
+				//log error
+				return new Response();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+		}catch (Exception e){
+			//log error
+			return new Response();
 		}
 		return response;
 	}
 
 	private static Response putPost(Request request) {
 		Response response = new Response();
-		Connection.initialize(request);
+		Connection.submit(request);
 	
 		try {
 			OutputStream out = Connection.connection.getOutputStream();
@@ -337,7 +347,6 @@ public class Connection {
 
 			Connection.connection.disconnect();
 			response.setBody(sb.toString());
-			System.out.println(response.getBody());
 			return response;
 		} catch (UnsupportedEncodingException e) {
 			try {
@@ -360,7 +369,7 @@ public class Connection {
 	private static Response delete(Request request) {
 		Response response = new Response();
 
-		Connection.initialize(request);
+		Connection.submit(request);
 		try {
 			response.setStatusCode(Integer.toString(Connection.connection
 					.getResponseCode()));
@@ -417,7 +426,7 @@ public class Connection {
 	}
 	
 	public static String Base64encode(String text){
-		 return Base64.encodeBase64String(text.getBytes()).toString();
+		return Base64.encodeBytes(text.getBytes()).toString();
 	}
 	
     ///////////////////////
